@@ -241,3 +241,7 @@ secrets.*
 # Raw customer data is local-only. Preserve the directory placeholder.
 data/raw/*
 !data/raw/.gitkeep
+
+# Processed customer data and fixed local split artifacts
+data/processed/*
+!data/processed/.gitkeep
