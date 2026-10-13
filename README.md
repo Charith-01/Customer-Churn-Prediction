@@ -34,15 +34,17 @@ customer-churn-prediction/
 |   `-- processed/                   # Cleaned data created in a later phase
 |-- notebooks/
 |   |-- 01_data_audit.ipynb          # Phase 1 audit
-|   `-- 02_data_cleaning_preprocessing.ipynb
+|   |-- 02_data_cleaning_preprocessing.ipynb
+|   `-- 03_exploratory_data_analysis.ipynb
 |-- src/
 |   |-- __init__.py
 |   `-- preprocessing.py             # Reusable cleaning, split, and pipeline code
 |-- models/                          # Saved model artifacts
 |-- reports/
-|   |-- figures/
+|   |-- figures/                     # Phase 3 presentation-ready PNG charts
 |   |-- data_audit.md                # Phase 1 findings
-|   `-- data_cleaning_report.md      # Phase 2 decisions
+|   |-- data_cleaning_report.md      # Phase 2 decisions
+|   `-- eda_analysis.md              # Phase 3 findings
 |-- tests/
 |   `-- test_preprocessing.py
 |-- requirements.txt
@@ -119,6 +121,20 @@ The transformer is designed to be placed inside a complete model `Pipeline`, ens
 
 The final test partition must remain untouched until final model evaluation. A dataset fingerprint prevents the saved indices from being reused with changed or reordered data.
 
+## Exploratory data analysis
+
+Phase 3 uses only the saved 960-row training partition for target-aware analysis; the 240-row final test partition remains sealed. The EDA notebook covers target imbalance, contract, tenure, charges, satisfaction, complaints, late payments, usage, payment method, nonlinear patterns, feature interactions, and unusual observations.
+
+The main training-sample findings are:
+
+- churn is the majority class at **86.35%**, so accuracy alone will not be an adequate model metric;
+- month-to-month customers have a **91.10%** churn rate, compared with **80.00%** for one-year and **79.08%** for two-year contracts;
+- usage shows the strongest descriptive separation: churn rises from **57.45%** in the lowest training-derived usage quintile to **99.47%** in the highest;
+- repeated late payments, three or more complaints, and lower satisfaction are associated with elevated churn, with small-group uncertainty noted in the report;
+- tenure, monthly charges, complaints, and usage show nonlinear or threshold-like patterns.
+
+These are associations rather than causal conclusions. The complete analysis is in `reports/eda_analysis.md`, and the 12 exported charts are under `reports/figures/`.
+
 ## Run the notebooks
 
 Start JupyterLab from the repository root:
@@ -131,14 +147,16 @@ Run the notebooks in order:
 
 1. `notebooks/01_data_audit.ipynb`
 2. `notebooks/02_data_cleaning_preprocessing.ipynb`
+3. `notebooks/03_exploratory_data_analysis.ipynb`
 
-Both notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
+All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
 For a command-line execution check:
 
 ```powershell
 jupyter nbconvert --to notebook --execute notebooks/01_data_audit.ipynb --output 01_data_audit.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/02_data_cleaning_preprocessing.ipynb --output 02_data_cleaning_preprocessing.ipynb --output-dir notebooks
+jupyter nbconvert --to notebook --execute notebooks/03_exploratory_data_analysis.ipynb --output 03_exploratory_data_analysis.ipynb --output-dir notebooks
 ```
 
 ## Run the tests
@@ -153,4 +171,6 @@ The tests cover deterministic cleaning, raw-file preservation, missing-value han
 
 ## Project status
 
-**Phase 2 complete:** deterministic data cleaning, fixed stratified splitting, and leakage-safe preprocessing are implemented and validated. No advanced EDA, feature engineering, model training, tuning, or final evaluation has been performed. Phase 3 should begin only after the cleaning decisions are approved.
+**Phase 3 complete:** the saved training split has been analyzed, 12 presentation-ready figures have been generated, and the findings and future feature proposals are documented. The final test set remained sealed. No feature engineering, model training, tuning, final evaluation, or retention simulation has been performed.
+
+**Next phase:** Phase 4 — Feature Engineering, after approval of the EDA findings.
