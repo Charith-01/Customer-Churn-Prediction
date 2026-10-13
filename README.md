@@ -35,18 +35,22 @@ customer-churn-prediction/
 |-- notebooks/
 |   |-- 01_data_audit.ipynb          # Phase 1 audit
 |   |-- 02_data_cleaning_preprocessing.ipynb
-|   `-- 03_exploratory_data_analysis.ipynb
+|   |-- 03_exploratory_data_analysis.ipynb
+|   `-- 04_feature_engineering.ipynb
 |-- src/
 |   |-- __init__.py
-|   `-- preprocessing.py             # Reusable cleaning, split, and pipeline code
+|   |-- preprocessing.py             # Reusable cleaning, split, and preprocessing code
+|   `-- feature_engineering.py       # Predictor-only feature transformer and pipeline
 |-- models/                          # Saved model artifacts
 |-- reports/
-|   |-- figures/                     # Phase 3 presentation-ready PNG charts
+|   |-- figures/                     # Presentation-ready PNG charts
 |   |-- data_audit.md                # Phase 1 findings
 |   |-- data_cleaning_report.md      # Phase 2 decisions
-|   `-- eda_analysis.md              # Phase 3 findings
+|   |-- eda_analysis.md              # Phase 3 findings
+|   `-- feature_engineering_report.md
 |-- tests/
-|   `-- test_preprocessing.py
+|   |-- test_preprocessing.py
+|   `-- test_feature_engineering.py
 |-- requirements.txt
 |-- .gitignore
 `-- README.md
@@ -135,6 +139,22 @@ The main training-sample findings are:
 
 These are associations rather than causal conclusions. The complete analysis is in `reports/eda_analysis.md`, and the 12 exported charts are under `reports/figures/`.
 
+## Feature engineering
+
+Phase 4 adds seven deterministic numerical features without using target values or identifiers:
+
+- `tenure_years`
+- `complaints_per_active_month`
+- `payment_risk_score`
+- `complaint_satisfaction_interaction`
+- `monthly_contract_tenure`
+- `late_payment_charge_interaction`
+- `usage_per_charge`
+
+`src/feature_engineering.py` provides a scikit-learn-compatible `CustomerFeatureEngineer` and `build_feature_preprocessing_pipeline()`. The integrated sequence is predictor input → deterministic feature engineering → training-fitted numerical imputation/scaling and categorical imputation/one-hot encoding. A classifier will be appended only in Phase 5, keeping all fitted transformations inside each future cross-validation fold.
+
+The original 18 predictors become 25 pre-encoding predictors with no row loss. `charges_per_tenure` remains deferred until cumulative-charge definitions are clarified. Temporal availability of usage, satisfaction, complaints, and payment history also requires business confirmation. Details and training-only statistics are in `reports/feature_engineering_report.md`; four additional figures use the `fe_` filename prefix under `reports/figures/`.
+
 ## Run the notebooks
 
 Start JupyterLab from the repository root:
@@ -148,6 +168,7 @@ Run the notebooks in order:
 1. `notebooks/01_data_audit.ipynb`
 2. `notebooks/02_data_cleaning_preprocessing.ipynb`
 3. `notebooks/03_exploratory_data_analysis.ipynb`
+4. `notebooks/04_feature_engineering.ipynb`
 
 All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
@@ -157,6 +178,7 @@ For a command-line execution check:
 jupyter nbconvert --to notebook --execute notebooks/01_data_audit.ipynb --output 01_data_audit.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/02_data_cleaning_preprocessing.ipynb --output 02_data_cleaning_preprocessing.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/03_exploratory_data_analysis.ipynb --output 03_exploratory_data_analysis.ipynb --output-dir notebooks
+jupyter nbconvert --to notebook --execute notebooks/04_feature_engineering.ipynb --output 04_feature_engineering.ipynb --output-dir notebooks
 ```
 
 ## Run the tests
@@ -167,10 +189,10 @@ From the repository root:
 python -m pytest tests -q
 ```
 
-The tests cover deterministic cleaning, raw-file preservation, missing-value handling, unknown categories, feature-role leakage, fixed-split reproducibility, train/test separation, training-only imputation, and invalid target labels.
+The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, stable feature names, unseen-data transformation, and invalid target labels.
 
 ## Project status
 
-**Phase 3 complete:** the saved training split has been analyzed, 12 presentation-ready figures have been generated, and the findings and future feature proposals are documented. The final test set remained sealed. No feature engineering, model training, tuning, final evaluation, or retention simulation has been performed.
+**Phase 4 complete:** seven deterministic engineered features and a leakage-safe feature/preprocessing pipeline are implemented, tested, and documented. The saved training split was reused and the final test set remained sealed. No classifier training, tuning, final evaluation, SHAP analysis, or retention simulation has been performed.
 
-**Next phase:** Phase 4 — Feature Engineering, after approval of the EDA findings.
+**Next phase:** Phase 5 — Model Development, after approval of the feature definitions and temporal-availability assumptions.

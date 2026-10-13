@@ -381,10 +381,13 @@ def create_or_load_fixed_split(
 def build_preprocessing_transformer(
     numerical_features: Sequence[str] | None = None,
     categorical_features: Sequence[str] | None = None,
+    *,
+    allowed_additional_numerical_features: Sequence[str] | None = None,
 ) -> ColumnTransformer:
     """Construct an unfitted transformer for use inside later model pipelines."""
     numerical = list(numerical_features or NUMERICAL_FEATURES)
     categorical = list(categorical_features or CATEGORICAL_FEATURES)
+    additional_numerical = set(allowed_additional_numerical_features or ())
     selected = numerical + categorical
 
     if len(selected) != len(set(selected)):
@@ -392,9 +395,20 @@ def build_preprocessing_transformer(
     forbidden = {IDENTIFIER_COLUMN, TARGET_COLUMN} & set(selected)
     if forbidden:
         raise ValueError(f"Identifier and target columns cannot be predictors: {forbidden}")
-    unknown = set(selected) - set(NUMERICAL_FEATURES) - set(CATEGORICAL_FEATURES)
+    unknown = (
+        set(selected)
+        - set(NUMERICAL_FEATURES)
+        - set(CATEGORICAL_FEATURES)
+        - additional_numerical
+    )
     if unknown:
         raise ValueError(f"Unrecognized predictor columns: {sorted(unknown)}")
+    categorical_additions = additional_numerical & set(categorical)
+    if categorical_additions:
+        raise ValueError(
+            "Additional numerical features cannot be configured as categorical: "
+            f"{sorted(categorical_additions)}"
+        )
 
     numerical_pipeline = Pipeline(
         steps=[
