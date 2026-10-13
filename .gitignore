@@ -205,6 +205,12 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
 # Ruff stuff:
 .ruff_cache/
 
@@ -218,3 +224,20 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local secrets and credentials
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.*
+
+# Project temporary files
+*.tmp
+*.temp
+*.bak
+~$*
+
+# Raw customer data is local-only. Preserve the directory placeholder.
+data/raw/*
+!data/raw/.gitkeep

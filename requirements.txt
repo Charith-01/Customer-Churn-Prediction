@@ -1,0 +1,14 @@
+# Core data analysis
+numpy>=1.26,<3.0
+pandas>=2.2,<4.0
+
+# Visualization and later exploratory analysis
+matplotlib>=3.8,<4.0
+seaborn>=0.13,<1.0
+
+# Later preprocessing, modeling, and evaluation phases
+scikit-learn>=1.4,<2.0
+
+# Reproducible notebooks
+jupyterlab>=4.2,<5.0
+nbconvert>=7.16,<8.0
