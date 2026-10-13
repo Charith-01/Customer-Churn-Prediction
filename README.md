@@ -36,21 +36,26 @@ customer-churn-prediction/
 |   |-- 01_data_audit.ipynb          # Phase 1 audit
 |   |-- 02_data_cleaning_preprocessing.ipynb
 |   |-- 03_exploratory_data_analysis.ipynb
-|   `-- 04_feature_engineering.ipynb
+|   |-- 04_feature_engineering.ipynb
+|   `-- 05_model_development.ipynb    # Phase 5 training-only model comparison
 |-- src/
 |   |-- __init__.py
 |   |-- preprocessing.py             # Reusable cleaning, split, and preprocessing code
-|   `-- feature_engineering.py       # Predictor-only feature transformer and pipeline
-|-- models/                          # Saved model artifacts
+|   |-- feature_engineering.py       # Predictor-only feature transformer and pipeline
+|   `-- modeling.py                  # CV, tuning, ranking metrics, and model persistence
+|-- models/                          # Local saved model artifacts (ignored by Git)
 |-- reports/
 |   |-- figures/                     # Presentation-ready PNG charts
+|   |-- modeling/                    # Aggregate Phase 5 CSV and JSON results
 |   |-- data_audit.md                # Phase 1 findings
 |   |-- data_cleaning_report.md      # Phase 2 decisions
 |   |-- eda_analysis.md              # Phase 3 findings
-|   `-- feature_engineering_report.md
+|   |-- feature_engineering_report.md
+|   `-- model_development_report.md
 |-- tests/
 |   |-- test_preprocessing.py
-|   `-- test_feature_engineering.py
+|   |-- test_feature_engineering.py
+|   `-- test_modeling.py
 |-- requirements.txt
 |-- .gitignore
 `-- README.md
@@ -155,6 +160,26 @@ Phase 4 adds seven deterministic numerical features without using target values 
 
 The original 18 predictors become 25 pre-encoding predictors with no row loss. `charges_per_tenure` remains deferred until cumulative-charge definitions are clarified. Temporal availability of usage, satisfaction, complaints, and payment history also requires business confirmation. Details and training-only statistics are in `reports/feature_engineering_report.md`; four additional figures use the `fe_` filename prefix under `reports/figures/`.
 
+## Model development
+
+Phase 5 compares a naive prior reference with Logistic Regression, Random Forest, and Histogram Gradient Boosting. Each classifier uses one complete leakage-safe pipeline:
+
+`predictors → Phase 4 feature engineering → numerical/categorical preprocessing → classifier`
+
+Model development uses only the fixed 960-row training partition. Every baseline, class-weight experiment, and hyperparameter candidate uses the same `StratifiedKFold(n_splits=5, shuffle=True, random_state=42)` folds. `RandomizedSearchCV` tests 16 configurations for each required model (48 configurations and 240 fits total), with Average Precision as the primary refit metric. Precision, recall, F1, ROC-AUC, PR-AUC, accuracy, precision@20%, recall@20%, and lift are retained for comparison.
+
+The provisional winner is the tuned Random Forest: mean CV PR-AUC **0.9782 ± 0.0060**, ROC-AUC **0.8822**, and precision@20% **0.9949**. It uses 400 trees, `max_features=0.5`, `min_samples_split=10`, `min_samples_leaf=2`, unrestricted depth, and balanced class weights. This is a training-CV result, not final held-out performance.
+
+Phase 5 outputs are located at:
+
+- `reports/model_development_report.md` — interpreted results and limitations
+- `reports/modeling/` — aggregate fold, comparison, search, and metadata files
+- `reports/figures/m5_*.png` — five model-comparison charts
+- `models/phase5_candidate_model.joblib` — local provisional fitted pipeline, ignored by Git
+- `data/processed/05_selected_model_oof_probabilities.csv` — local training-only out-of-fold probabilities, ignored by Git
+
+The serialized model and row-level out-of-fold file are intentionally excluded from version control. The final 240-row test partition remains sealed.
+
 ## Run the notebooks
 
 Start JupyterLab from the repository root:
@@ -169,6 +194,7 @@ Run the notebooks in order:
 2. `notebooks/02_data_cleaning_preprocessing.ipynb`
 3. `notebooks/03_exploratory_data_analysis.ipynb`
 4. `notebooks/04_feature_engineering.ipynb`
+5. `notebooks/05_model_development.ipynb`
 
 All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
@@ -179,6 +205,7 @@ jupyter nbconvert --to notebook --execute notebooks/01_data_audit.ipynb --output
 jupyter nbconvert --to notebook --execute notebooks/02_data_cleaning_preprocessing.ipynb --output 02_data_cleaning_preprocessing.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/03_exploratory_data_analysis.ipynb --output 03_exploratory_data_analysis.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/04_feature_engineering.ipynb --output 04_feature_engineering.ipynb --output-dir notebooks
+jupyter nbconvert --to notebook --execute notebooks/05_model_development.ipynb --output 05_model_development.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=900
 ```
 
 ## Run the tests
@@ -189,10 +216,18 @@ From the repository root:
 python -m pytest tests -q
 ```
 
-The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, stable feature names, unseen-data transformation, and invalid target labels.
+To run the Phase 5 modeling tests only:
+
+```powershell
+python -m pytest tests/test_modeling.py -q
+```
+
+The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, candidate persistence, and final-test isolation.
+
+The executed Phase 5 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, and joblib 1.6.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
 
 ## Project status
 
-**Phase 4 complete:** seven deterministic engineered features and a leakage-safe feature/preprocessing pipeline are implemented, tested, and documented. The saved training split was reused and the final test set remained sealed. No classifier training, tuning, final evaluation, SHAP analysis, or retention simulation has been performed.
+**Phase 5 complete:** three required classifiers and a naive reference were trained and compared with leakage-safe five-fold CV, bounded hyperparameter tuning, class-weight experiments, and training-only top-20% ranking analysis. A tuned Random Forest is saved locally as the provisional candidate. The fixed split was preserved and no held-out test metric or prediction was calculated.
 
-**Next phase:** Phase 5 — Model Development, after approval of the feature definitions and temporal-availability assumptions.
+**Next phase:** Class Imbalance, Threshold Selection, Calibration and Final Evaluation, after approval. Final-test evaluation, final threshold selection, explainability, and retention simulation are outside Phase 5 and have not started.

@@ -1,0 +1,60 @@
+{
+  "artifact_role": "provisional candidate; not final test validated",
+  "best_parameters": {
+    "model__class_weight": "balanced",
+    "model__max_depth": null,
+    "model__max_features": 0.5,
+    "model__min_samples_leaf": 2,
+    "model__min_samples_split": 10,
+    "model__n_estimators": 400
+  },
+  "contact_fraction": 0.2,
+  "cross_validation": {
+    "n_splits": 5,
+    "random_state": 42,
+    "shuffle": true,
+    "strategy": "StratifiedKFold"
+  },
+  "feature_engineering": [
+    "tenure_years",
+    "complaints_per_active_month",
+    "payment_risk_score",
+    "complaint_satisfaction_interaction",
+    "monthly_contract_tenure",
+    "late_payment_charge_interaction",
+    "usage_per_charge"
+  ],
+  "final_test_used": false,
+  "model_artifact": "models\\phase5_candidate_model.joblib",
+  "model_key": "random_forest",
+  "model_name": "Random Forest",
+  "oof_output": "data\\processed\\05_selected_model_oof_probabilities.csv",
+  "oof_top20_metrics": {
+    "contact_count": 192,
+    "lift_at_20": 1.1519903498190591,
+    "precision_at_20": 0.9947916666666666,
+    "prevalence": 0.8635416666666667,
+    "random_precision_baseline": 0.8635416666666667,
+    "random_recall_baseline": 0.2,
+    "recall_at_20": 0.23039806996381182,
+    "true_positives_contacted": 191
+  },
+  "phase": 5,
+  "primary_scoring": "average_precision",
+  "random_state": 42,
+  "scikit_learn_version": "1.9.1",
+  "selected_cv_metrics": {
+    "mean_accuracy": 0.8375,
+    "mean_f1": 0.9014429905458309,
+    "mean_lift_at_20": 1.1520970595669389,
+    "mean_pr_auc": 0.9781904879981914,
+    "mean_precision": 0.9450815523020821,
+    "mean_precision_at_20": 0.9948717948717949,
+    "mean_recall": 0.8625556772544725,
+    "mean_recall_at_20": 0.23401971522453452,
+    "mean_roc_auc": 0.8822147018532561,
+    "std_pr_auc": 0.006004475295901682
+  },
+  "training_dataset_fingerprint": "df788deba598b73abdc3a41b8a1947af63a90c5f369c2a498386a2c0eefeb769",
+  "training_rows": 960
+}

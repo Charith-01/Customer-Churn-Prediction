@@ -245,3 +245,6 @@ data/raw/*
 # Processed customer data and fixed local split artifacts
 data/processed/*
 !data/processed/.gitkeep
+
+# Local candidate model artifacts; metadata and aggregate metrics remain tracked.
+models/*.joblib
