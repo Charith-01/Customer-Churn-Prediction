@@ -1,0 +1,19 @@
+feature,customer_value,training_reference,original_probability,reference_probability,probability_effect,absolute_effect,direction
+contract_type,One year,Month-to-month,0.6423196084129577,0.9113787961931828,-0.2690591877802252,0.2690591877802252,actual value lowers predicted risk vs reference
+monthly_usage_gb,35.4,65.0,0.6423196084129577,0.8730538924346452,-0.2307342840216875,0.2307342840216875,actual value lowers predicted risk vs reference
+age,74,47,0.6423196084129577,0.44622530302645674,0.1960943053865009,0.1960943053865009,actual value raises predicted risk vs reference
+monthly_charges,Missing,71.22,0.6423196084129577,0.7560338790878416,-0.11371427067488393,0.11371427067488393,actual value lowers predicted risk vs reference
+late_payments_last_12m,2,1,0.6423196084129577,0.5992330809319377,0.04308652748101993,0.04308652748101993,actual value raises predicted risk vs reference
+tenure_months,57,35,0.6423196084129577,0.6836991748076796,-0.041379566394721956,0.041379566394721956,actual value lowers predicted risk vs reference
+region,Sabaragamuwa,Central,0.6423196084129577,0.6268898145606956,0.015429793852262064,0.015429793852262064,actual value raises predicted risk vs reference
+satisfaction_score,6.7,6.8,0.6423196084129577,0.6269471236916548,0.015372484721302815,0.015372484721302815,actual value raises predicted risk vs reference
+support_plan,Yes,No,0.6423196084129577,0.6450948763154699,-0.0027752679025122573,0.0027752679025122573,actual value lowers predicted risk vs reference
+total_charges,2044.58,2176.06,0.6423196084129577,0.6440513061782838,-0.0017316977653261123,0.0017316977653261123,actual value lowers predicted risk vs reference
+payment_method,Mailed check,Electronic check,0.6423196084129577,0.6432961907189046,-0.0009765823059469936,0.0009765823059469936,actual value lowers predicted risk vs reference
+paperless_billing,No,Yes,0.6423196084129577,0.643120478110889,-0.0008008696979313612,0.0008008696979313612,actual value lowers predicted risk vs reference
+discount_pct,13.36,8.58,0.6423196084129577,0.6416828134718703,0.0006367949410873708,0.0006367949410873708,actual value raises predicted risk vs reference
+complaints_last_12m,1,1,0.6423196084129577,0.6423196084129577,0.0,0.0,no measurable change
+internet_service,Fiber optic,Fiber optic,0.6423196084129577,0.6423196084129577,0.0,0.0,no measurable change
+dependents,No,No,0.6423196084129577,0.6423196084129577,0.0,0.0,no measurable change
+tech_support,No,No,0.6423196084129577,0.6423196084129577,0.0,0.0,no measurable change
+senior_citizen,0,0,0.6423196084129577,0.6423196084129577,0.0,0.0,no measurable change

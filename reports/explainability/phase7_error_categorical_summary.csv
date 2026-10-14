@@ -1,0 +1,49 @@
+confusion_category,feature,value,customer_count,within_category_share
+true_positive,contract_type,Month-to-month,61,0.6224489795918368
+true_positive,contract_type,One year,23,0.23469387755102042
+true_positive,contract_type,Two year,14,0.14285714285714285
+true_positive,region,North Central,16,0.16326530612244897
+true_positive,region,Western,15,0.15306122448979592
+true_positive,region,Southern,14,0.14285714285714285
+true_positive,region,Eastern,12,0.12244897959183673
+true_positive,region,Sabaragamuwa,9,0.09183673469387756
+true_positive,region,Uva,9,0.09183673469387756
+true_positive,region,Northern,9,0.09183673469387756
+true_positive,region,North Western,7,0.07142857142857142
+true_positive,region,Central,7,0.07142857142857142
+true_positive,internet_service,Fiber optic,52,0.5306122448979592
+true_positive,internet_service,DSL,36,0.3673469387755102
+true_positive,internet_service,No,10,0.10204081632653061
+true_negative,contract_type,One year,13,0.40625
+true_negative,contract_type,Month-to-month,12,0.375
+true_negative,contract_type,Two year,7,0.21875
+true_negative,region,Uva,5,0.15625
+true_negative,region,Western,5,0.15625
+true_negative,region,Sabaragamuwa,4,0.125
+true_negative,region,Central,4,0.125
+true_negative,region,North Western,3,0.09375
+true_negative,region,Eastern,3,0.09375
+true_negative,region,North Central,3,0.09375
+true_negative,region,Northern,3,0.09375
+true_negative,region,Southern,2,0.0625
+true_negative,internet_service,DSL,14,0.4375
+true_negative,internet_service,Fiber optic,13,0.40625
+true_negative,internet_service,No,5,0.15625
+false_positive,contract_type,One year,1,1.0
+false_positive,region,North Western,1,1.0
+false_positive,internet_service,Fiber optic,1,1.0
+false_negative,contract_type,Month-to-month,73,0.6697247706422018
+false_negative,contract_type,One year,21,0.1926605504587156
+false_negative,contract_type,Two year,15,0.13761467889908258
+false_negative,region,Northern,16,0.14678899082568808
+false_negative,region,Central,14,0.12844036697247707
+false_negative,region,North Central,14,0.12844036697247707
+false_negative,region,Southern,13,0.11926605504587157
+false_negative,region,Sabaragamuwa,13,0.11926605504587157
+false_negative,region,North Western,13,0.11926605504587157
+false_negative,region,Western,12,0.11009174311926606
+false_negative,region,Eastern,8,0.07339449541284404
+false_negative,region,Uva,6,0.05504587155963303
+false_negative,internet_service,Fiber optic,59,0.5412844036697247
+false_negative,internet_service,DSL,39,0.3577981651376147
+false_negative,internet_service,No,11,0.10091743119266056

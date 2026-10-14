@@ -1,0 +1,19 @@
+feature,customer_value,training_reference,original_probability,reference_probability,probability_effect,absolute_effect,direction
+monthly_usage_gb,75.8,65.0,0.9782785743276138,0.9311250729911297,0.047153501336484105,0.047153501336484105,actual value raises predicted risk vs reference
+monthly_charges,46.63,71.22,0.9782785743276138,0.9770359984951608,0.001242575832453019,0.001242575832453019,actual value raises predicted risk vs reference
+tenure_months,38,35,0.9782785743276138,0.9793631035861733,-0.0010845292585595079,0.0010845292585595079,actual value lowers predicted risk vs reference
+satisfaction_score,7.2,6.8,0.9782785743276138,0.9790226399238238,-0.0007440655962099862,0.0007440655962099862,actual value lowers predicted risk vs reference
+paperless_billing,No,Yes,0.9782785743276138,0.9789499194186744,-0.0006713450910605934,0.0006713450910605934,actual value lowers predicted risk vs reference
+dependents,Yes,No,0.9782785743276138,0.9784245236199528,-0.00014594929233902043,0.00014594929233902043,actual value lowers predicted risk vs reference
+tech_support,Yes,No,0.9782785743276138,0.9783670345899879,-8.846026237407933e-05,8.846026237407933e-05,actual value lowers predicted risk vs reference
+internet_service,DSL,Fiber optic,0.9782785743276138,0.9783510958038821,-7.252147626835015e-05,7.252147626835015e-05,actual value lowers predicted risk vs reference
+age,55,47,0.9782785743276138,0.9782100911851911,6.848314242269282e-05,6.848314242269282e-05,actual value raises predicted risk vs reference
+discount_pct,1.79,8.58,0.9782785743276138,0.9782239582751673,5.461605244649892e-05,5.461605244649892e-05,actual value raises predicted risk vs reference
+payment_method,Credit card,Electronic check,0.9782785743276138,0.9782970195366223,-1.8445209008510766e-05,1.8445209008510766e-05,actual value lowers predicted risk vs reference
+support_plan,Yes,No,0.9782785743276138,0.9782965256279619,-1.7951300348095778e-05,1.7951300348095778e-05,actual value lowers predicted risk vs reference
+total_charges,1877.23,2176.06,0.9782785743276138,0.9782839494966297,-5.375169015886527e-06,5.375169015886527e-06,actual value lowers predicted risk vs reference
+complaints_last_12m,1,1,0.9782785743276138,0.9782785743276138,0.0,0.0,no measurable change
+late_payments_last_12m,1,1,0.9782785743276138,0.9782785743276138,0.0,0.0,no measurable change
+contract_type,Month-to-month,Month-to-month,0.9782785743276138,0.9782785743276138,0.0,0.0,no measurable change
+region,Central,Central,0.9782785743276138,0.9782785743276138,0.0,0.0,no measurable change
+senior_citizen,0,0,0.9782785743276138,0.9782785743276138,0.0,0.0,no measurable change

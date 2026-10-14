@@ -1,0 +1,4 @@
+customer_label,actual_churn,predicted_probability,threshold,predicted_class,correct_prediction,confusion_category,monthly_usage_gb,contract_type,satisfaction_score,late_payments_last_12m,region,monthly_charges,discount_pct,internet_service
+Customer A,1,0.9782785743276138,0.9707090004321576,1,True,true_positive,75.8,Month-to-month,7.2,1,Central,46.63,1.79,DSL
+Customer B,0,0.6423196084129577,0.9707090004321576,0,True,true_negative,35.4,One year,6.7,2,Sabaragamuwa,Missing,13.36,Fiber optic
+Customer C,1,0.970636039717889,0.9707090004321576,0,False,false_negative,76.3,One year,7.5,1,North Central,116.07,13.6,DSL

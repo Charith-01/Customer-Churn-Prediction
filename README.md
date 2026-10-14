@@ -38,29 +38,34 @@ customer-churn-prediction/
 |   |-- 03_exploratory_data_analysis.ipynb
 |   |-- 04_feature_engineering.ipynb
 |   |-- 05_model_development.ipynb    # Phase 5 training-only model comparison
-|   `-- 06_model_evaluation.ipynb     # Locked policy and final evaluation
+|   |-- 06_model_evaluation.ipynb     # Locked policy and final evaluation
+|   `-- 07_model_explainability.ipynb # Global, local, and error explanations
 |-- src/
 |   |-- __init__.py
 |   |-- preprocessing.py             # Reusable cleaning, split, and preprocessing code
 |   |-- feature_engineering.py       # Predictor-only feature transformer and pipeline
 |   |-- modeling.py                  # CV, tuning, ranking metrics, and model persistence
-|   `-- evaluation.py                # Calibration, thresholds, metrics, and robustness
+|   |-- evaluation.py                # Calibration, thresholds, metrics, and robustness
+|   `-- explainability.py            # Model-preserving global/local explanation utilities
 |-- models/                          # Local saved model artifacts (ignored by Git)
 |-- reports/
 |   |-- figures/                     # Presentation-ready PNG charts
 |   |-- modeling/                    # Aggregate Phase 5 CSV and JSON results
 |   |-- evaluation/                  # Aggregate Phase 6 evaluation results
+|   |-- explainability/              # Aggregate/anonymized Phase 7 explanation tables
 |   |-- data_audit.md                # Phase 1 findings
 |   |-- data_cleaning_report.md      # Phase 2 decisions
 |   |-- eda_analysis.md              # Phase 3 findings
 |   |-- feature_engineering_report.md
 |   |-- model_development_report.md
-|   `-- model_evaluation_report.md
+|   |-- model_evaluation_report.md
+|   `-- model_explainability_report.md
 |-- tests/
 |   |-- test_preprocessing.py
 |   |-- test_feature_engineering.py
 |   |-- test_modeling.py
-|   `-- test_evaluation.py
+|   |-- test_evaluation.py
+|   `-- test_explainability.py
 |-- requirements.txt
 |-- .gitignore
 `-- README.md
@@ -212,6 +217,21 @@ Phase 6 outputs are located at:
 
 Only trusted joblib artifacts should be loaded. No explainability or retention simulation was performed in Phase 6.
 
+## Model explainability
+
+Phase 7 explains the unchanged calibrated Random Forest and locked threshold. Global explanation uses 10-repeat original-feature permutation importance on the held-out test partition, scored by Average Precision. `monthly_usage_gb` is the dominant input (mean AP decrease **0.1072 +/- 0.0164**), followed by contract type (**0.0044**), satisfaction (**0.0036**), and late payments (**0.0017**). Observed feature-effect and usage-by-satisfaction summaries add direction context without making causal claims.
+
+Three anonymized test cases—a true positive, true negative, and near-threshold false negative—use model-agnostic one-feature-at-a-time probability sensitivity against training-derived references. The error review preserves the Phase 6 counts of 98 true positives, 32 true negatives, 1 false positive, and 109 false negatives. No customer identifier is included in explanation outputs.
+
+Phase 7 outputs are located at:
+
+- `reports/model_explainability_report.md` — methods, findings, limitations, and Phase 8 recommendations
+- `reports/explainability/` — global importance, feature effects, error summaries, anonymized cases, and integrity checks
+- `reports/figures/phase7_*.png` — seven explanation charts
+- `src/explainability.py` — validated reusable explanation utilities
+
+The model artifact SHA-256, probability predictions, calibration, and operating threshold **0.970709** were verified unchanged. Explanations characterize fitted-model behavior and associations, not causal effects. Retention simulation remains deferred to Phase 8.
+
 ## Run the notebooks
 
 Start JupyterLab from the repository root:
@@ -228,6 +248,7 @@ Run the notebooks in order:
 4. `notebooks/04_feature_engineering.ipynb`
 5. `notebooks/05_model_development.ipynb`
 6. `notebooks/06_model_evaluation.ipynb`
+7. `notebooks/07_model_explainability.ipynb`
 
 All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
@@ -240,6 +261,7 @@ jupyter nbconvert --to notebook --execute notebooks/03_exploratory_data_analysis
 jupyter nbconvert --to notebook --execute notebooks/04_feature_engineering.ipynb --output 04_feature_engineering.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/05_model_development.ipynb --output 05_model_development.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=900
 jupyter nbconvert --to notebook --execute notebooks/06_model_evaluation.ipynb --output 06_model_evaluation.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
+jupyter nbconvert --to notebook --execute notebooks/07_model_explainability.ipynb --output 07_model_explainability.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 ```
 
 ## Run the tests
@@ -262,12 +284,18 @@ To run the Phase 6 evaluation tests only:
 python -m pytest tests/test_evaluation.py -q
 ```
 
-The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, threshold metrics, capacity and probability-tie behavior, calibration diagnostics, robustness summaries, artifact persistence, and inference consistency.
+To run the Phase 7 explainability tests only:
 
-The executed Phase 6 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, and joblib 1.6.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
+```powershell
+python -m pytest tests/test_explainability.py -q
+```
+
+The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, threshold metrics, capacity and probability-tie behavior, calibration diagnostics, robustness summaries, artifact persistence, inference consistency, deterministic permutation importance, local sensitivity, anonymization, confusion categories, and before/after prediction preservation.
+
+The executed Phase 6–7 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, and joblib 1.6.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
 
 ## Project status
 
-**Phase 6 complete:** the Phase 5 Random Forest was retained, sigmoid calibration and a 0.970709 operating threshold were selected from training-only nested/OOF evidence, the decision policy was locked, and the sealed test partition was evaluated without retrospective tuning. Final test ROC-AUC is 0.8994 and Average Precision is 0.9819. The fixed threshold's 41.25% test contact rate shows that strict operational capacity requires top-k selection rather than a fixed cutoff.
+**Phase 7 complete:** the locked calibrated Random Forest was explained globally and for three anonymized customer cases. Original-feature permutation importance identifies monthly usage as the dominant ranking signal, and error analysis documents the threshold's high-precision/low-recall behavior. Artifact, prediction, data, split, and threshold integrity checks all pass.
 
-**Next phase:** Model Explainability, after approval. No explainability, individual-customer reporting, intervention simulation, or cost-benefit analysis has started.
+**Next phase:** Retention Intervention Simulation, after approval. No intervention simulation, uplift claim, or cost-benefit analysis has started.

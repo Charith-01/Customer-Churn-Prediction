@@ -1,0 +1,5 @@
+confusion_category,customer_count
+true_positive,98
+true_negative,32
+false_positive,1
+false_negative,109

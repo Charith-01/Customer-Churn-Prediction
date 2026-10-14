@@ -1,0 +1,19 @@
+feature,customer_value,training_reference,original_probability,reference_probability,probability_effect,absolute_effect,direction
+monthly_usage_gb,76.3,65.0,0.970636039717889,0.8162104150844911,0.15442562463339793,0.15442562463339793,actual value raises predicted risk vs reference
+monthly_charges,116.07,71.22,0.970636039717889,0.9794605846465808,-0.00882454492869178,0.00882454492869178,actual value lowers predicted risk vs reference
+contract_type,One year,Month-to-month,0.970636039717889,0.9784888285387892,-0.007852788820900125,0.007852788820900125,actual value lowers predicted risk vs reference
+discount_pct,13.6,8.58,0.970636039717889,0.9713652043983358,-0.0007291646804468144,0.0007291646804468144,actual value lowers predicted risk vs reference
+satisfaction_score,7.5,6.8,0.970636039717889,0.9713244792023193,-0.0006884394844303143,0.0006884394844303143,actual value lowers predicted risk vs reference
+region,North Central,Central,0.970636039717889,0.9700014725420434,0.0006345671758456461,0.0006345671758456461,actual value raises predicted risk vs reference
+internet_service,DSL,Fiber optic,0.970636039717889,0.9709603452327503,-0.00032430551486128945,0.00032430551486128945,actual value lowers predicted risk vs reference
+age,34,47,0.970636039717889,0.970816878738491,-0.00018083902060195278,0.00018083902060195278,actual value lowers predicted risk vs reference
+tenure_months,29,35,0.970636039717889,0.9705092195887826,0.00012682012910647522,0.00012682012910647522,actual value raises predicted risk vs reference
+total_charges,3261.06,2176.06,0.970636039717889,0.9706656344932544,-2.9594775365349157e-05,2.9594775365349157e-05,actual value lowers predicted risk vs reference
+payment_method,Credit card,Electronic check,0.970636039717889,0.9706495505976294,-1.3510879740330495e-05,1.3510879740330495e-05,actual value lowers predicted risk vs reference
+complaints_last_12m,1,1,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change
+late_payments_last_12m,1,1,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change
+paperless_billing,Yes,Yes,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change
+dependents,No,No,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change
+support_plan,No,No,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change
+tech_support,No,No,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change
+senior_citizen,0,0,0.970636039717889,0.970636039717889,0.0,0.0,no measurable change

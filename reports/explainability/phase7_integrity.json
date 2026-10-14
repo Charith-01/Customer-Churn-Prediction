@@ -1,0 +1,23 @@
+{
+  "anonymized_customers_explained": 3,
+  "cleaned_dataset_unchanged": true,
+  "customer_identifiers_saved": false,
+  "dataset_fingerprint": "df788deba598b73abdc3a41b8a1947af63a90c5f369c2a498386a2c0eefeb769",
+  "global_importance_rows": 18,
+  "global_method": "raw-input permutation importance scored by held-out Average Precision",
+  "local_method": "one-feature-at-a-time probability sensitivity against training references",
+  "metadata_unchanged": true,
+  "model_artifact_sha256_after": "b3635a3e65e850bca895a8c7506de6bcd3add2953a3829759544eddede0ed496",
+  "model_artifact_sha256_before": "b3635a3e65e850bca895a8c7506de6bcd3add2953a3829759544eddede0ed496",
+  "model_artifact_unchanged": true,
+  "model_retrained_or_tuned": false,
+  "notebook_completed": true,
+  "operating_threshold": 0.9707090004321576,
+  "phase": 7,
+  "prediction_hash_after": "4e95bae1a6bff60cfdb7a8b2161716e31555cdbcc7ca73d003109a926219e1ae",
+  "prediction_hash_before": "4e95bae1a6bff60cfdb7a8b2161716e31555cdbcc7ca73d003109a926219e1ae",
+  "predictions_unchanged": true,
+  "raw_dataset_unchanged": true,
+  "split_artifact_unchanged": true,
+  "threshold_unchanged": true
+}
