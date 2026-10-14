@@ -37,25 +37,30 @@ customer-churn-prediction/
 |   |-- 02_data_cleaning_preprocessing.ipynb
 |   |-- 03_exploratory_data_analysis.ipynb
 |   |-- 04_feature_engineering.ipynb
-|   `-- 05_model_development.ipynb    # Phase 5 training-only model comparison
+|   |-- 05_model_development.ipynb    # Phase 5 training-only model comparison
+|   `-- 06_model_evaluation.ipynb     # Locked policy and final evaluation
 |-- src/
 |   |-- __init__.py
 |   |-- preprocessing.py             # Reusable cleaning, split, and preprocessing code
 |   |-- feature_engineering.py       # Predictor-only feature transformer and pipeline
-|   `-- modeling.py                  # CV, tuning, ranking metrics, and model persistence
+|   |-- modeling.py                  # CV, tuning, ranking metrics, and model persistence
+|   `-- evaluation.py                # Calibration, thresholds, metrics, and robustness
 |-- models/                          # Local saved model artifacts (ignored by Git)
 |-- reports/
 |   |-- figures/                     # Presentation-ready PNG charts
 |   |-- modeling/                    # Aggregate Phase 5 CSV and JSON results
+|   |-- evaluation/                  # Aggregate Phase 6 evaluation results
 |   |-- data_audit.md                # Phase 1 findings
 |   |-- data_cleaning_report.md      # Phase 2 decisions
 |   |-- eda_analysis.md              # Phase 3 findings
 |   |-- feature_engineering_report.md
-|   `-- model_development_report.md
+|   |-- model_development_report.md
+|   `-- model_evaluation_report.md
 |-- tests/
 |   |-- test_preprocessing.py
 |   |-- test_feature_engineering.py
-|   `-- test_modeling.py
+|   |-- test_modeling.py
+|   `-- test_evaluation.py
 |-- requirements.txt
 |-- .gitignore
 `-- README.md
@@ -178,7 +183,34 @@ Phase 5 outputs are located at:
 - `models/phase5_candidate_model.joblib` — local provisional fitted pipeline, ignored by Git
 - `data/processed/05_selected_model_oof_probabilities.csv` — local training-only out-of-fold probabilities, ignored by Git
 
-The serialized model and row-level out-of-fold file are intentionally excluded from version control. The final 240-row test partition remains sealed.
+The serialized model and row-level out-of-fold file are intentionally excluded from version control. The final 240-row test partition remained sealed throughout Phase 5.
+
+## Final model evaluation
+
+Phase 6 retains the tuned Random Forest and balanced class weighting selected in Phase 5. Sigmoid calibration was selected through nested training-only cross-validation because it improved OOF Brier score from **0.1061** to **0.0840** and log loss from **0.3328** to **0.2752** without reducing ranking performance.
+
+The fixed operating threshold is **0.970709**, selected from sigmoid-calibrated OOF probabilities to maximize churner recall subject to a 20% training contact-rate cap. At that OOF threshold, precision was **0.9948**, recall was **0.2304**, and 192 of 960 training rows were selected.
+
+After the policy was persisted, the 240-row test partition was evaluated once. Final probability and ranking results were:
+
+- ROC-AUC: **0.8994**
+- Average Precision: **0.9819**, versus 86.25% test churn prevalence
+- Brier score: **0.0825**
+- Log loss: **0.2627**
+
+At the locked threshold, accuracy was **0.5417**, precision **0.9899**, recall **0.4734**, and F1 **0.6405**. The confusion matrix contained 32 true negatives, 1 false positive, 109 false negatives, and 98 true positives.
+
+The fixed threshold selected **41.25%** of test rows, despite selecting 20% in training OOF data. It was not revised after test evaluation. This is an important operational limitation: a fixed probability cutoff cannot guarantee the contact cap when score distributions shift. A strict campaign limit requires deterministic top-k ranking, which is deferred to Phase 8.
+
+Phase 6 outputs are located at:
+
+- `reports/model_evaluation_report.md` — final metrics, calibration, limitations, and interpretation
+- `reports/evaluation/` — locked policy, aggregate metrics, calibration bins, and robustness tables
+- `reports/figures/phase6_*.png` — eight evaluation charts
+- `models/03_model_artifact.joblib` — local complete calibrated model, ignored by Git
+- `models/final_model_metadata.json` — locked model and policy metadata
+
+Only trusted joblib artifacts should be loaded. No explainability or retention simulation was performed in Phase 6.
 
 ## Run the notebooks
 
@@ -195,6 +227,7 @@ Run the notebooks in order:
 3. `notebooks/03_exploratory_data_analysis.ipynb`
 4. `notebooks/04_feature_engineering.ipynb`
 5. `notebooks/05_model_development.ipynb`
+6. `notebooks/06_model_evaluation.ipynb`
 
 All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
@@ -206,6 +239,7 @@ jupyter nbconvert --to notebook --execute notebooks/02_data_cleaning_preprocessi
 jupyter nbconvert --to notebook --execute notebooks/03_exploratory_data_analysis.ipynb --output 03_exploratory_data_analysis.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/04_feature_engineering.ipynb --output 04_feature_engineering.ipynb --output-dir notebooks
 jupyter nbconvert --to notebook --execute notebooks/05_model_development.ipynb --output 05_model_development.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=900
+jupyter nbconvert --to notebook --execute notebooks/06_model_evaluation.ipynb --output 06_model_evaluation.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 ```
 
 ## Run the tests
@@ -222,12 +256,18 @@ To run the Phase 5 modeling tests only:
 python -m pytest tests/test_modeling.py -q
 ```
 
-The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, candidate persistence, and final-test isolation.
+To run the Phase 6 evaluation tests only:
 
-The executed Phase 5 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, and joblib 1.6.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
+```powershell
+python -m pytest tests/test_evaluation.py -q
+```
+
+The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, threshold metrics, capacity and probability-tie behavior, calibration diagnostics, robustness summaries, artifact persistence, and inference consistency.
+
+The executed Phase 6 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, and joblib 1.6.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
 
 ## Project status
 
-**Phase 5 complete:** three required classifiers and a naive reference were trained and compared with leakage-safe five-fold CV, bounded hyperparameter tuning, class-weight experiments, and training-only top-20% ranking analysis. A tuned Random Forest is saved locally as the provisional candidate. The fixed split was preserved and no held-out test metric or prediction was calculated.
+**Phase 6 complete:** the Phase 5 Random Forest was retained, sigmoid calibration and a 0.970709 operating threshold were selected from training-only nested/OOF evidence, the decision policy was locked, and the sealed test partition was evaluated without retrospective tuning. Final test ROC-AUC is 0.8994 and Average Precision is 0.9819. The fixed threshold's 41.25% test contact rate shows that strict operational capacity requires top-k selection rather than a fixed cutoff.
 
-**Next phase:** Class Imbalance, Threshold Selection, Calibration and Final Evaluation, after approval. Final-test evaluation, final threshold selection, explainability, and retention simulation are outside Phase 5 and have not started.
+**Next phase:** Model Explainability, after approval. No explainability, individual-customer reporting, intervention simulation, or cost-benefit analysis has started.

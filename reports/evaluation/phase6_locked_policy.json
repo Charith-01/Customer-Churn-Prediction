@@ -1,0 +1,168 @@
+{
+  "calibration": {
+    "comparison": [
+      {
+        "average_precision": 0.977327836378173,
+        "bins": 10,
+        "brier_score": 0.10607501034401992,
+        "expected_calibration_error": 0.11806886562656102,
+        "log_loss": 0.33278298545773893,
+        "mean_predicted_probability": 0.745743397377382,
+        "method": "uncalibrated",
+        "observations": 960,
+        "prevalence": 0.8635416666666667,
+        "roc_auc": 0.8803764307221982
+      },
+      {
+        "average_precision": 0.9782369103210777,
+        "bins": 10,
+        "brier_score": 0.08400039123523372,
+        "expected_calibration_error": 0.02187249568308729,
+        "log_loss": 0.2752175081567459,
+        "mean_predicted_probability": 0.8624293052513043,
+        "method": "sigmoid",
+        "observations": 960,
+        "prevalence": 0.8635416666666667,
+        "roc_auc": 0.8817760752861443
+      },
+      {
+        "average_precision": 0.973594848568263,
+        "bins": 9,
+        "brier_score": 0.08445718068337775,
+        "expected_calibration_error": 0.01294624530140789,
+        "log_loss": 0.3078433193295126,
+        "mean_predicted_probability": 0.8626154206327131,
+        "method": "isotonic",
+        "observations": 960,
+        "prevalence": 0.8635416666666667,
+        "roc_auc": 0.8718404405197102
+      }
+    ],
+    "decision": {
+      "brier_improvement": 0.022074619108786206,
+      "decision": "adopt sigmoid calibration",
+      "method": "sigmoid",
+      "rule": "require Brier improvement >= 0.002, lower log loss and ECE, and AP/ROC-AUC degradation <= 0.002; choose lowest Brier score"
+    },
+    "folds_for_final_training_fit": 5,
+    "inner_splits_for_comparison": 3,
+    "method": "sigmoid",
+    "selection_data": "nested out-of-fold training predictions only"
+  },
+  "class_weight": "balanced",
+  "contact_capacity_assumption": 0.2,
+  "dataset_fingerprint": "df788deba598b73abdc3a41b8a1947af63a90c5f369c2a498386a2c0eefeb769",
+  "feature_engineering": [
+    "tenure_years",
+    "complaints_per_active_month",
+    "payment_risk_score",
+    "complaint_satisfaction_interaction",
+    "monthly_contract_tenure",
+    "late_payment_charge_interaction",
+    "usage_per_charge"
+  ],
+  "final_test_used_for_any_decision": false,
+  "fixed_threshold_rule": "predict churn when probability >= operating_threshold",
+  "future_strict_capacity_policy": "rank probabilities descending and select deterministic top-k; Phase 8 scope",
+  "hyperparameters": {
+    "model__class_weight": "balanced",
+    "model__max_depth": null,
+    "model__max_features": 0.5,
+    "model__min_samples_leaf": 2,
+    "model__min_samples_split": 10,
+    "model__n_estimators": 400
+  },
+  "metrics_locked": [
+    "accuracy",
+    "precision",
+    "recall",
+    "f1",
+    "roc_auc",
+    "average_precision",
+    "brier_score",
+    "log_loss",
+    "confusion_matrix"
+  ],
+  "model_artifact": "models\\03_model_artifact.joblib",
+  "model_artifact_sha256": "b3635a3e65e850bca895a8c7506de6bcd3add2953a3829759544eddede0ed496",
+  "model_key": "random_forest",
+  "operating_threshold": 0.9707090004321576,
+  "package_versions": {
+    "joblib": "1.6.0",
+    "matplotlib": "3.11.2",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "python": "3.13.3",
+    "scikit_learn": "1.9.1",
+    "seaborn": "0.13.2"
+  },
+  "phase": 6,
+  "policy_status": "locked before final-test outcome access",
+  "preprocessing": {
+    "categorical_features": [
+      "contract_type",
+      "internet_service",
+      "region",
+      "payment_method",
+      "paperless_billing",
+      "dependents",
+      "support_plan",
+      "tech_support",
+      "senior_citizen"
+    ],
+    "categorical_steps": [
+      "constant Missing imputation",
+      "dense one-hot encoding"
+    ],
+    "numerical_features": [
+      "age",
+      "tenure_months",
+      "monthly_charges",
+      "total_charges",
+      "complaints_last_12m",
+      "late_payments_last_12m",
+      "satisfaction_score",
+      "monthly_usage_gb",
+      "discount_pct",
+      "tenure_years",
+      "complaints_per_active_month",
+      "payment_risk_score",
+      "complaint_satisfaction_interaction",
+      "monthly_contract_tenure",
+      "late_payment_charge_interaction",
+      "usage_per_charge"
+    ],
+    "numerical_steps": [
+      "median imputation",
+      "standard scaling"
+    ],
+    "unknown_categories": "ignored"
+  },
+  "random_seed": 42,
+  "selected_model": "Random Forest",
+  "split_artifact_sha256": "4325cbfeb6523b8594174ef19926790c08114ca360a78dbe2701378e4fd0a235",
+  "target_mapping": {
+    "0": 0,
+    "1": 1
+  },
+  "test_indices_sha256": "7e5dde1840d892ef6428921c806adbf97333ee1d1f2ad707d2431277d8cf5ce2",
+  "test_rows": 240,
+  "threshold_selection": {
+    "capacity": 0.2,
+    "f1": 0.37414299706170423,
+    "false_negative": 638.0,
+    "false_positive": 1.0,
+    "precision": 0.9947916666666666,
+    "predicted_positive_count": 192.0,
+    "predicted_positive_rate": 0.2,
+    "recall": 0.23039806996381182,
+    "selection_method": "maximize OOF recall subject to contact rate <= capacity; break ties by precision, fewer contacts, then higher threshold",
+    "threshold": 0.9707090004321576,
+    "tie_handling": "probability >= threshold; all exact-score ties are included together",
+    "true_negative": 130.0,
+    "true_positive": 191.0
+  },
+  "train_indices_sha256": "02e383499ea516cc64e1f982f3239aa0e03bf5a6338a24eb8b9eff756a6a88ee",
+  "training_rows": 960,
+  "trusted_artifact_warning": "Load joblib artifacts only from trusted sources."
+}

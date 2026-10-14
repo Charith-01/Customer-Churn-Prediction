@@ -1,0 +1,24 @@
+{
+  "final_test": {
+    "average_precision": 0.9818517355897546,
+    "bins": 10,
+    "brier_score": 0.0824680566191713,
+    "expected_calibration_error": 0.032359849219132486,
+    "log_loss": 0.26265958131917233,
+    "mean_predicted_probability": 0.8717952140274228,
+    "observations": 240,
+    "prevalence": 0.8625,
+    "roc_auc": 0.8994290733421169
+  },
+  "training_oof": {
+    "average_precision": 0.9782369103210777,
+    "bins": 10,
+    "brier_score": 0.0840003912352337,
+    "expected_calibration_error": 0.02187249568308729,
+    "log_loss": 0.2752175081567459,
+    "mean_predicted_probability": 0.8624293052513043,
+    "observations": 960,
+    "prevalence": 0.8635416666666667,
+    "roc_auc": 0.8817760752861443
+  }
+}
