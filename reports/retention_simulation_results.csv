@@ -1,0 +1,32 @@
+metric,value,unit,result_type,description
+total_customers,240.0,count,measured,Locked held-out score summary
+minimum_probability,0.24521822964330703,probability,measured,Locked held-out score summary
+maximum_probability,0.9807461420177483,probability,measured,Locked held-out score summary
+mean_probability,0.8717952140274228,probability,measured,Locked held-out score summary
+median_probability,0.9628129572247033,probability,measured,Locked held-out score summary
+unique_probabilities,240.0,count,measured,Locked held-out score summary
+tied_score_groups,0.0,count,measured,Locked held-out score summary
+customers_with_tied_scores,0.0,count,measured,Locked held-out score summary
+selected_customers,48.0,count,measured,Model-ranked top-20% retrospective result
+actual_selected_percentage,20.0,percent,measured,Model-ranked top-20% retrospective result
+selected_churners,48.0,count,measured,Model-ranked top-20% retrospective result
+selected_non_churners,0.0,count,measured,Model-ranked top-20% retrospective result
+outside_churners,159.0,count,measured,Model-ranked top-20% retrospective result
+total_actual_churners,207.0,count,measured,Model-ranked top-20% retrospective result
+precision_at_20,1.0,ratio,measured,Model-ranked top-20% retrospective result
+recall_at_20,0.2318840579710145,ratio,measured,Model-ranked top-20% retrospective result
+lift_at_20,1.1594202898550725,ratio,measured,Model-ranked top-20% retrospective result
+random_expected_churners_captured,41.400000000000006,expected count,exact expectation,Uniform random selection with equal contact budget
+random_expected_precision_at_20,0.8625,ratio,exact expectation,Uniform random selection
+random_expected_recall_at_20,0.2,ratio,exact expectation,Uniform random selection
+monte_carlo_mean_churners_captured,41.4133,simulated count,simulation,"10,000 samples without replacement, seed 42"
+contact_cost_per_customer,5.0,hypothetical USD,assumption,"Illustrative, not company data"
+value_per_retained_customer,150.0,hypothetical USD,assumption,"Illustrative, not company data"
+intervention_success_rate,0.1,assumed ratio,assumption,Not a measured causal effect
+model_expected_net_benefit,480.0000000000001,hypothetical USD,scenario estimate,Observed capture plus base assumptions
+random_expected_net_benefit,381.0000000000001,hypothetical USD,scenario estimate,Exact random capture expectation plus base assumptions
+incremental_expected_net_benefit,99.0,hypothetical USD,scenario estimate,Model minus random under equal assumptions
+model_roi_percent,200.00000000000006,percent,scenario estimate,Base assumptions
+random_roi_percent,158.75000000000006,percent,scenario estimate,Base assumptions
+model_break_even_success_rate,0.03333333333333333,ratio,scenario estimate,Base cost and retained value
+random_break_even_success_rate,0.03864734299516907,ratio,scenario estimate,Base cost and retained value

@@ -24,6 +24,7 @@ Customer churn reduces recurring revenue and increases replacement costs. The bu
 - Matplotlib and seaborn for visual analysis
 - scikit-learn for preprocessing, modeling, and evaluation
 - JupyterLab for reproducible notebooks
+- ReportLab and PyMuPDF for deterministic PDF generation and validation
 
 ## Repository structure
 
@@ -39,17 +40,21 @@ customer-churn-prediction/
 |   |-- 04_feature_engineering.ipynb
 |   |-- 05_model_development.ipynb    # Phase 5 training-only model comparison
 |   |-- 06_model_evaluation.ipynb     # Locked policy and final evaluation
-|   `-- 07_model_explainability.ipynb # Global, local, and error explanations
+|   |-- 07_model_explainability.ipynb # Global, local, and error explanations
+|   `-- 08_retention_simulation.ipynb # Capacity and business-impact simulation
 |-- src/
 |   |-- __init__.py
 |   |-- preprocessing.py             # Reusable cleaning, split, and preprocessing code
 |   |-- feature_engineering.py       # Predictor-only feature transformer and pipeline
 |   |-- modeling.py                  # CV, tuning, ranking metrics, and model persistence
 |   |-- evaluation.py                # Calibration, thresholds, metrics, and robustness
-|   `-- explainability.py            # Model-preserving global/local explanation utilities
+|   |-- explainability.py            # Model-preserving global/local explanation utilities
+|   |-- retention_simulation.py      # Capacity, baseline, and economics utilities
+|   `-- reporting.py                 # Deterministic final-report generation and validation
 |-- models/                          # Local saved model artifacts (ignored by Git)
 |-- reports/
 |   |-- figures/                     # Presentation-ready PNG charts
+|   |-- business_report_preview/     # Rendered pages used for visual QA
 |   |-- modeling/                    # Aggregate Phase 5 CSV and JSON results
 |   |-- evaluation/                  # Aggregate Phase 6 evaluation results
 |   |-- explainability/              # Aggregate/anonymized Phase 7 explanation tables
@@ -59,13 +64,21 @@ customer-churn-prediction/
 |   |-- feature_engineering_report.md
 |   |-- model_development_report.md
 |   |-- model_evaluation_report.md
-|   `-- model_explainability_report.md
+|   |-- model_explainability_report.md
+|   |-- retention_simulation_report.md
+|   |-- retention_simulation_results.csv
+|   |-- retention_sensitivity_analysis.csv
+|   |-- business_report_content.md   # Auditable narrative source for the PDF
+|   `-- report_source_mapping.md     # Report-to-evidence traceability map
 |-- tests/
 |   |-- test_preprocessing.py
 |   |-- test_feature_engineering.py
 |   |-- test_modeling.py
 |   |-- test_evaluation.py
-|   `-- test_explainability.py
+|   |-- test_explainability.py
+|   |-- test_retention_simulation.py
+|   `-- test_reporting.py
+|-- 04_business_report.pdf           # Canonical seven-page business report
 |-- requirements.txt
 |-- .gitignore
 `-- README.md
@@ -232,6 +245,37 @@ Phase 7 outputs are located at:
 
 The model artifact SHA-256, probability predictions, calibration, and operating threshold **0.970709** were verified unchanged. Explanations characterize fitted-model behavior and associations, not causal effects. Retention simulation remains deferred to Phase 8.
 
+## Retention intervention simulation
+
+Phase 8 applies a strict **20% contact capacity** to the unchanged held-out churn probabilities. Customers are ranked by probability descending; exact ties use original held-out order as a stable, target-independent secondary key. Capacity is calculated with `floor(N × 0.20)`, so 48 of 240 customers are selected. This top-k policy is separate from—and does not alter—the locked Phase 6 threshold.
+
+All 48 selected customers historically churned. Measured ranking results are precision@20% **1.0000**, recall/capture@20% **0.2319**, and lift@20% **1.1594**. Uniform random selection with the same 48-contact budget would capture **41.4 churners in expectation**, compared with 48 observed in the model-ranked group. The advantage is meaningful but bounded by the test sample's high **86.25%** churn prevalence.
+
+The base financial scenario uses illustrative assumptions only: **$5** per contact, **$150** value per successfully retained customer, and **10%** intervention effectiveness. It estimates model-ranked net benefit of **$480**, random-selection net benefit of **$381**, and incremental expected benefit of **$99**. These are not company financials, realized savings, or evidence of causal retention impact. A 27-scenario sensitivity grid varies effectiveness, cost, and value; a randomized pilot is recommended before rollout.
+
+Phase 8 outputs are located at:
+
+- `reports/retention_simulation_report.md` — business interpretation, recommendations, risks, and operational workflow
+- `reports/retention_simulation_results.csv` — aggregate measured results, assumptions, and base estimates
+- `reports/retention_sensitivity_analysis.csv` — 27 hypothetical financial scenarios
+- `reports/retention_simulation_integrity.json` — model, prediction, split, and data preservation checks
+- `reports/figures/phase8_*.png` — five ranking and financial charts
+- `data/processed/internal_retention_ranking.csv` — protected, Git-ignored retrospective analysis table with no raw customer IDs
+
+No API, application, database, or live campaign is produced in this phase.
+
+## Final business report
+
+Phase 9 consolidates the verified Phase 1-8 evidence into the canonical seven-page A4 report at `04_business_report.pdf`. It is written for business stakeholders while preserving technical traceability: the report distinguishes measured results, fitted-model interpretations, hypothetical financial scenarios, and proposed actions. It covers the business problem, dataset and preparation, EDA, feature engineering, model comparison, locked held-out evaluation, calibration, global and customer-level explainability, top-20% retention simulation, recommendations, roadmap, limitations, and conclusion.
+
+The report is generated deterministically from `reports/business_report_content.md` and the validated analytical outputs. `reports/report_source_mapping.md` maps every report section to its source evidence, while `reports/business_report_preview/` contains all seven rendered pages used for visual inspection. Regenerate and validate the PDF from the repository root with:
+
+```powershell
+python -m src.reporting
+```
+
+The generator checks the locked model hash, split fingerprint, Phase 7-8 integrity evidence, report metrics, page count, page text, unresolved placeholders, and customer-ID privacy. It reads but never fits or modifies the model. ReportLab creates the PDF and PyMuPDF performs text extraction, rendering, and automated PDF checks.
+
 ## Run the notebooks
 
 Start JupyterLab from the repository root:
@@ -249,6 +293,7 @@ Run the notebooks in order:
 5. `notebooks/05_model_development.ipynb`
 6. `notebooks/06_model_evaluation.ipynb`
 7. `notebooks/07_model_explainability.ipynb`
+8. `notebooks/08_retention_simulation.ipynb`
 
 All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
@@ -262,6 +307,7 @@ jupyter nbconvert --to notebook --execute notebooks/04_feature_engineering.ipynb
 jupyter nbconvert --to notebook --execute notebooks/05_model_development.ipynb --output 05_model_development.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=900
 jupyter nbconvert --to notebook --execute notebooks/06_model_evaluation.ipynb --output 06_model_evaluation.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 jupyter nbconvert --to notebook --execute notebooks/07_model_explainability.ipynb --output 07_model_explainability.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
+jupyter nbconvert --to notebook --execute notebooks/08_retention_simulation.ipynb --output 08_retention_simulation.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 ```
 
 ## Run the tests
@@ -290,12 +336,24 @@ To run the Phase 7 explainability tests only:
 python -m pytest tests/test_explainability.py -q
 ```
 
-The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, threshold metrics, capacity and probability-tie behavior, calibration diagnostics, robustness summaries, artifact persistence, inference consistency, deterministic permutation importance, local sensitivity, anonymization, confusion categories, and before/after prediction preservation.
+To run the Phase 8 retention-simulation tests only:
 
-The executed Phase 6–7 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, and joblib 1.6.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
+```powershell
+python -m pytest tests/test_retention_simulation.py -q
+```
+
+To run the Phase 9 reporting tests only:
+
+```powershell
+python -m pytest tests/test_reporting.py -q
+```
+
+The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, threshold metrics, capacity and probability-tie behavior, calibration diagnostics, robustness summaries, artifact persistence, inference consistency, deterministic permutation importance, local sensitivity, anonymization, confusion categories, capacity-safe ranking, random baselines, retention economics, sensitivity scenarios, before/after prediction preservation, deterministic PDF generation, evidence consistency, page completeness, visual-source availability, and report privacy.
+
+The executed Phase 6-9 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, joblib 1.6.0, ReportLab 4.4.10, and PyMuPDF 1.28.2. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
 
 ## Project status
 
-**Phase 7 complete:** the locked calibrated Random Forest was explained globally and for three anonymized customer cases. Original-feature permutation importance identifies monthly usage as the dominant ranking signal, and error analysis documents the threshold's high-precision/low-recall behavior. Artifact, prediction, data, split, and threshold integrity checks all pass.
+**Phase 9 complete:** the verified Phase 1-8 evidence is consolidated into `04_business_report.pdf`, a reproducible seven-page stakeholder report. All pages were programmatically validated and visually inspected; the source mapping, privacy checks, required metrics, model-artifact hash, and byte-level reproducibility checks pass.
 
-**Next phase:** Retention Intervention Simulation, after approval. No intervention simulation, uplift claim, or cost-benefit analysis has started.
+**Next phase:** Final Project Integration and Submission, after approval. No submission ZIP or Phase 10 packaging has been created.
