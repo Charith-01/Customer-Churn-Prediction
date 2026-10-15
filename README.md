@@ -24,7 +24,7 @@ Customer churn reduces recurring revenue and increases replacement costs. The bu
 - Matplotlib and seaborn for visual analysis
 - scikit-learn for preprocessing, modeling, and evaluation
 - JupyterLab for reproducible notebooks
-- ReportLab and PyMuPDF for deterministic PDF generation and validation
+- ReportLab, PyMuPDF, and Pillow for deterministic PDF generation, rendering, and visual-review artifacts
 
 ## Repository structure
 
@@ -54,7 +54,7 @@ customer-churn-prediction/
 |-- models/                          # Local saved model artifacts (ignored by Git)
 |-- reports/
 |   |-- figures/                     # Presentation-ready PNG charts
-|   |-- business_report_preview/     # Rendered pages used for visual QA
+|   |-- business_report_preview/     # High-resolution pages and seven-page contact sheet
 |   |-- modeling/                    # Aggregate Phase 5 CSV and JSON results
 |   |-- evaluation/                  # Aggregate Phase 6 evaluation results
 |   |-- explainability/              # Aggregate/anonymized Phase 7 explanation tables
@@ -268,13 +268,13 @@ No API, application, database, or live campaign is produced in this phase.
 
 Phase 9 consolidates the verified Phase 1-8 evidence into the canonical seven-page A4 report at `04_business_report.pdf`. It is written for business stakeholders while preserving technical traceability: the report distinguishes measured results, fitted-model interpretations, hypothetical financial scenarios, and proposed actions. It covers the business problem, dataset and preparation, EDA, feature engineering, model comparison, locked held-out evaluation, calibration, global and customer-level explainability, top-20% retention simulation, recommendations, roadmap, limitations, and conclusion.
 
-The report is generated deterministically from `reports/business_report_content.md` and the validated analytical outputs. `reports/report_source_mapping.md` maps every report section to its source evidence, while `reports/business_report_preview/` contains all seven rendered pages used for visual inspection. Regenerate and validate the PDF from the repository root with:
+The report is generated deterministically from `reports/business_report_content.md` and the validated analytical outputs. `reports/report_source_mapping.md` maps every report section to its source evidence, while `reports/business_report_preview/` contains seven high-resolution rendered pages and `contact_sheet.png` for visual inspection. Report-specific EDA and model-comparison charts are regenerated directly from the locked training split and model-comparison output. Regenerate and validate the PDF from the repository root with:
 
 ```powershell
 python -m src.reporting
 ```
 
-The generator checks the locked model hash, split fingerprint, Phase 7-8 integrity evidence, report metrics, page count, page text, unresolved placeholders, and customer-ID privacy. It reads but never fits or modifies the model. ReportLab creates the PDF and PyMuPDF performs text extraction, rendering, and automated PDF checks.
+The generator checks the locked model hash, split fingerprint, Phase 7-8 integrity evidence, report metrics, page count, portrait layout, page text, required business interpretations, unresolved placeholders, and customer-ID privacy. It reads but never fits or modifies the model. ReportLab creates the PDF, PyMuPDF validates and renders it, and Pillow assembles the visual-review contact sheet.
 
 ## Run the notebooks
 
@@ -350,10 +350,10 @@ python -m pytest tests/test_reporting.py -q
 
 The tests cover deterministic cleaning and feature engineering, raw-file preservation, missing and zero-denominator handling, unknown categories, target/identifier leakage, fixed-split reproducibility, train/test separation, training-only imputation, model construction, valid probabilities and class ordering, stratified CV, top-20% tie handling, threshold metrics, capacity and probability-tie behavior, calibration diagnostics, robustness summaries, artifact persistence, inference consistency, deterministic permutation importance, local sensitivity, anonymization, confusion categories, capacity-safe ranking, random baselines, retention economics, sensitivity scenarios, before/after prediction preservation, deterministic PDF generation, evidence consistency, page completeness, visual-source availability, and report privacy.
 
-The executed Phase 6-9 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, joblib 1.6.0, ReportLab 4.4.10, and PyMuPDF 1.28.2. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
+The executed Phase 6-9 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, joblib 1.6.0, ReportLab 4.4.10, PyMuPDF 1.28.2, and Pillow 12.3.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
 
 ## Project status
 
-**Phase 9 complete:** the verified Phase 1-8 evidence is consolidated into `04_business_report.pdf`, a reproducible seven-page stakeholder report. All pages were programmatically validated and visually inspected; the source mapping, privacy checks, required metrics, model-artifact hash, and byte-level reproducibility checks pass.
+**Phase 9.1 complete:** the verified Phase 1-8 evidence is consolidated into a corrected, submission-ready `04_business_report.pdf`. The seven-page report uses larger report-specific charts, readable tables and captions, balanced page layouts, professional headers and footers, explicit low-accuracy interpretation, calibrated-probability context, and a prominent distinction between locked-threshold classification and capacity-safe top-20% ranking. All pages were programmatically validated and visually inspected; the source mapping, privacy checks, required metrics, data and model integrity checks, and byte-level reproducibility checks pass.
 
 **Next phase:** Final Project Integration and Submission, after approval. No submission ZIP or Phase 10 packaging has been created.

@@ -14,6 +14,7 @@ from src.reporting import (
     extract_pdf_text,
     file_sha256,
     generate_business_report,
+    generate_report_figures,
     load_verified_results,
     pdf_page_count,
     validate_generated_report,
@@ -109,6 +110,33 @@ def test_report_contains_no_raw_customer_identifiers(generated_report: Path) -> 
     assert re.search(r"\bCUST\d{6}\b", report_text, re.IGNORECASE) is None
 
 
+def test_required_business_interpretation_is_explicit(generated_report: Path) -> None:
+    report_text = extract_pdf_text(generated_report)
+    normalized_text = " ".join(report_text.split())
+    required_phrases = {
+        "0.8625 always-churn baseline",
+        "selected 99 of 240 customers (41.25%)",
+        "select exactly 48",
+        "Customer A",
+        "Customer B",
+        "Customer C",
+        "hypothetical",
+    }
+    for phrase in required_phrases:
+        assert phrase in normalized_text
+    assert "Phase 9 |" not in report_text
+
+
+def test_rendered_pages_and_contact_sheet_exist() -> None:
+    preview_directory = ROOT / "reports" / "business_report_preview"
+    page_previews = sorted(preview_directory.glob("page_*.png"))
+    assert len(page_previews) == 7
+    assert all(path.stat().st_size > 0 for path in page_previews)
+    contact_sheet = preview_directory / "contact_sheet.png"
+    assert contact_sheet.is_file()
+    assert contact_sheet.stat().st_size > 0
+
+
 def test_generation_does_not_modify_model_artifact(tmp_path: Path) -> None:
     sources = load_verified_results(ROOT)
     model_path = sources["paths"]["model"]
@@ -124,6 +152,28 @@ def test_generation_does_not_modify_evaluation_results(tmp_path: Path) -> None:
     before = file_sha256(evaluation_path)
     generate_business_report(ROOT, tmp_path / "evaluation-integrity-check.pdf")
     assert file_sha256(evaluation_path) == before
+
+
+def test_generation_does_not_modify_original_or_cleaned_data(tmp_path: Path) -> None:
+    raw_path = ROOT / "data" / "raw" / "customer_churn_advanced_dataset.csv"
+    cleaned_path = ROOT / "data" / "processed" / "02_cleaned_dataset.csv"
+    before = (file_sha256(raw_path), file_sha256(cleaned_path))
+    generate_business_report(ROOT, tmp_path / "data-integrity-check.pdf")
+    assert (file_sha256(raw_path), file_sha256(cleaned_path)) == before
+
+
+def test_report_specific_figures_are_reproducible() -> None:
+    figure_paths = generate_report_figures(ROOT)
+    before = {path.name: file_sha256(path) for path in figure_paths}
+    regenerated = generate_report_figures(ROOT)
+    after = {path.name: file_sha256(path) for path in regenerated}
+    assert after == before
+
+
+def test_report_generation_dependencies_are_documented() -> None:
+    requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8").lower()
+    for dependency in ("reportlab", "pymupdf", "pillow"):
+        assert dependency in requirements
 
 
 def test_report_generation_is_byte_reproducible(tmp_path: Path) -> None:

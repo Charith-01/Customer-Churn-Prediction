@@ -10,6 +10,8 @@ Logistic Regression, Random Forest, and Histogram Gradient Boosting were compare
 
 At the locked probability threshold, precision was 0.9899 and recall was 0.4734. For a campaign with a hard 20% contact limit, deterministic ranking selected 48 of 240 held-out customers; all 48 historically churned. This produced precision@20% 1.0000, recall@20% 0.2319, and lift 1.1594 versus random selection. The result supports risk prioritization, but it does not show that contacting a customer prevents churn.
 
+The principal business takeaway is to use the model as a prioritization aid rather than an automated retention decision. Current customers should be scored, ranked, and filtered through a fixed contact capacity, eligibility rules, privacy controls, and a controlled intervention pilot.
+
 ## Business Problem and Objectives
 
 Customer churn reduces recurring value and creates replacement costs, while retention teams have finite capacity. The project objectives were to build a reproducible churn-risk model, identify the strongest measured risk signals, explain individual predictions, and assess whether ranking can concentrate historical churners within a 20% contact budget. The project deliberately separates prediction from intervention effectiveness.
@@ -40,17 +42,25 @@ Seven deterministic features were added without using target values: tenure in y
 
 Logistic Regression, Random Forest, and Histogram Gradient Boosting were evaluated alongside a naive prior reference. All models used the same five stratified folds and complete feature/preprocessing pipeline. Sixteen hyperparameter configurations were evaluated for each main model using Average Precision as the primary selection metric.
 
-The tuned Random Forest produced mean cross-validation Average Precision 0.9782 ± 0.0060 and ROC-AUC 0.8822. Tuned Logistic Regression achieved Average Precision 0.9752, and tuned Histogram Gradient Boosting achieved 0.9741. The Random Forest also achieved precision@20% 0.9949 in training cross-validation and was selected before final-test access.
+The tuned Random Forest produced mean cross-validation Average Precision 0.9782 +/- 0.0060 and ROC-AUC 0.8822. Tuned Logistic Regression achieved Average Precision 0.9752, while tuned Histogram Gradient Boosting achieved 0.9741. These differences are small: Random Forest exceeded Logistic Regression by 0.0030 and Histogram Gradient Boosting by 0.0041 in mean Average Precision.
+
+Random Forest was selected before final-test access because it combined the highest mean Average Precision and ROC-AUC, joint-best precision@20% of 0.9949, and relatively low fold-to-fold Average Precision variation. Its 400-tree ensemble is more complex than Logistic Regression, so the simpler model remains a reasonable fallback where transparency or operating cost outweighs the modest ranking gain.
 
 ## Final Evaluation and Calibration
 
-Sigmoid calibration was selected through nested training-only cross-validation because it improved Brier score from 0.1061 to 0.0840 and log loss from 0.3328 to 0.2752 without material ranking degradation. The locked operating threshold was 0.970709, chosen from training out-of-fold scores under a 20% capacity design.
+Sigmoid calibration was selected through nested training-only cross-validation because it improved Brier score from 0.1061 to 0.0840, log loss from 0.3328 to 0.2752, and expected calibration error from 0.1181 to 0.0219 without material ranking degradation. Isotonic calibration slightly improved expected calibration error but reduced ranking metrics and carried greater overfitting risk on the limited sample. Calibration improves probability reliability; it does not make probabilities perfectly calibrated.
 
-On the 240-row held-out test set, the final model achieved accuracy 0.5417, precision 0.9899, recall 0.4734, F1 0.6405, ROC-AUC 0.8994, and Average Precision 0.9819. The confusion matrix contained 98 true positives, 32 true negatives, one false positive, and 109 false negatives. The threshold selected 41.25% of test customers, showing that a fixed probability cutoff cannot guarantee campaign capacity when score distributions shift.
+On the 240-row held-out test set, the final model achieved accuracy 0.5417, precision 0.9899, recall 0.4734, F1 0.6405, ROC-AUC 0.8994, and Average Precision 0.9819. The confusion matrix contained 98 true positives, 32 true negatives, one false positive, and 109 false negatives.
+
+Accuracy of 0.5417 is not strong and is below the 0.8625 held-out majority-class baseline. This occurs because the deliberately high locked threshold predicts churn for only 99 customers: it produces just one false positive and therefore precision of 0.9899, but it misses 109 of 207 churners, limiting recall to 0.4734. High precision answers whether flagged customers churned; it does not imply that most churners were found.
+
+ROC-AUC 0.8994 measures discrimination across thresholds, while Average Precision 0.9819 summarizes positive-class ranking and must be judged against the already-high 0.8625 churn prevalence. Both support risk ranking even though the locked binary rule has weak accuracy and incomplete recall. The final ROC-AUC and Average Precision remain inside the Phase 5 fold ranges; held-out Brier score 0.0825 and log loss 0.2627 are also consistent with nested training estimates. Uncertainty remains because the test set contains only 33 retained customers.
+
+The threshold and campaign rules serve different purposes. The locked classification threshold of 0.970709 was preserved and selected 99 of 240 held-out customers, or 41.25%. The operational policy instead ranks every probability from highest to lowest and selects exactly the top 48 customers, with original held-out order as the deterministic tie-breaker. No threshold was retuned from test outcomes.
 
 ## Global Explainability
 
-Original-feature permutation importance measured the decrease in held-out Average Precision after each input was shuffled. Monthly usage was the dominant feature with mean importance 0.1072 ± 0.0164. Contract type ranked second at 0.0044, followed by satisfaction score at 0.0036 and late payments at 0.0017. The remaining features were close to zero relative to repeated-permutation variability.
+Original-feature permutation importance measured the decrease in held-out Average Precision after each input was shuffled. Monthly usage was the dominant feature with mean importance 0.1072 +/- 0.0164. Contract type ranked second at 0.0044, followed by satisfaction score at 0.0036 and late payments at 0.0017. The remaining features were close to zero relative to repeated-permutation variability.
 
 Observed predictions rose sharply with usage and generally fell as satisfaction increased. Month-to-month customers had higher average fitted risk than fixed-term customers. Importance and grouped predictions describe model behavior and association; they do not prove that changing a feature will change churn.
 
@@ -62,9 +72,9 @@ Customer C was a false negative at probability 0.9706, only 0.000073 below the l
 
 ## Top-20% Retention Simulation
 
-The capacity policy ranks the unchanged held-out probabilities descending and selects exactly floor(N × 0.20) customers. Original held-out order is the predeclared secondary key for ties and does not use customer identity or actual churn. For 240 evaluated customers, 48 were selected.
+The campaign policy is separate from threshold-based classification. It ranks the unchanged held-out probabilities descending and selects exactly floor(N x 0.20) customers. Original held-out order is the predeclared secondary key for ties and does not use customer identity or actual churn. For 240 evaluated customers, 48 were selected; the locked threshold itself would have selected 99 and therefore cannot enforce the contact limit.
 
-All 48 selected customers historically churned, giving precision@20% 1.0000 and recall/capture@20% 0.2319. With overall churn prevalence 0.8625, lift was 1.1594. Uniform random selection with the same contact count would capture 41.4 churners in expectation, so model ranking concentrated 6.6 additional historical churners. “Captured” means present in the retrospective group, not successfully retained.
+All 48 selected customers historically churned, giving precision@20% 1.0000 and recall/capture@20% 0.2319. With overall churn prevalence 0.8625, lift was 1.1594. Uniform random selection with the same contact count would capture 41.4 churners in expectation, so model ranking concentrated 6.6 additional historical churners. "Captured" means present in the retrospective group, not successfully retained.
 
 ## Hypothetical Business Impact
 
@@ -80,13 +90,14 @@ These actions are intervention hypotheses. They can create agent cost, discount 
 
 ## Implementation Roadmap
 
-Validate current and consented input data, generate probabilities using the saved model, rank customers by risk, apply the top-20% limit, review eligibility and fairness constraints, assign approved interventions, run a controlled pilot, record treatment and outcome data, and monitor data quality, drift, calibration, capture, costs, and subgroup outcomes.
+The practical sequence is: validate current and consented input data; generate probabilities using the saved model; rank customers by risk; apply the top-20% limit; review eligibility, privacy, and fairness constraints; assign approved interventions; run a controlled pilot and record treatment and outcome data; then monitor data quality, drift, calibration, capture, costs, and subgroup outcomes.
 
 ## Limitations
 
-The dataset is modest and has unusually high churn prevalence. Missing values and unresolved service/usage relationships remain. Predictor timing is not documented well enough to eliminate all temporal-leakage risk. The final evaluation uses one held-out sample rather than external or temporal validation. Model importance and local sensitivity are associative. No treatment-response data or verified company cost and value inputs exist, and the financial analysis is hypothetical. The project is not production-ready without governance, privacy, fairness, monitoring, and causal pilot evaluation.
+The dataset is modest and has unusually high churn prevalence. Missing values and unresolved service/usage relationships remain. Predictor timing is not documented well enough to eliminate all temporal-leakage risk. The final evaluation uses one held-out sample rather than external or temporal validation, and only 33 retained customers appear in the test set. Calibration and the very high threshold may shift in a future population.
+
+Model importance and local sensitivity are associative rather than causal. No treatment-response data or verified company cost and value inputs exist, so the financial analysis is hypothetical. Customer scoring also requires purpose limitation, access control, fairness review, human oversight, and monitoring for subgroup harm. The project is not production-ready without those controls and a causal pilot evaluation.
 
 ## Conclusion
 
 The project demonstrates that a calibrated Random Forest can rank churn risk effectively and concentrate historical churners within a limited contact budget. The strongest result is operational prioritization, not proof of churn prevention. The appropriate next step is a governed randomized retention pilot that measures incremental outcomes and replaces illustrative economics with verified business inputs.
-
