@@ -22,7 +22,7 @@ from src.reporting import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CANONICAL_REPORT = ROOT / "04_business_report.pdf"
+CANONICAL_REPORT = ROOT / "reports" / "04_business_report.pdf"
 
 
 @pytest.fixture(scope="module")

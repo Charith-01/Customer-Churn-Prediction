@@ -53,7 +53,7 @@ WHITE = colors.white
 
 REPORT_TITLE = "Customer Churn Prediction and Retention Analysis"
 REPORT_SUBTITLE = "End-to-End Machine Learning and Business Retention Insights"
-DEFAULT_OUTPUT_NAME = "04_business_report.pdf"
+DEFAULT_OUTPUT_NAME = Path("reports") / "04_business_report.pdf"
 
 REQUIRED_FIGURES = (
     "01_churn_distribution.png",
@@ -964,7 +964,7 @@ def generate_business_report(
             [
                 gains_image,
                 Paragraph(
-                    "Figure 7. Model-ranked cumulative churner capture stays above the equal-budget random expectation; the dashed line marks the 20% contact limit.",
+                    "Figure 7. Solid purple shows model-ranked capture; the dashed blue diagonal is random selection, and the vertical dotted line marks the 20% contact limit.",
                     styles["caption"],
                 ),
             ]
@@ -1190,8 +1190,9 @@ def validate_generated_report(pdf_path: str | Path, root: str | Path) -> dict[st
 
 
 if __name__ == "__main__":
-    generated = generate_business_report()
-    preview_directory = generated.parent / "reports" / "business_report_preview"
+    project_root = Path(__file__).resolve().parents[1]
+    generated = generate_business_report(project_root)
+    preview_directory = project_root / "reports" / "business_report_preview"
     rendered_pages = render_pdf_pages(generated, preview_directory)
     contact_sheet = create_contact_sheet(
         generated,
@@ -1199,5 +1200,5 @@ if __name__ == "__main__":
     )
     print(f"Generated {generated}")
     print(f"Rendered {len(rendered_pages)} pages and {contact_sheet}")
-    print(validate_generated_report(generated, generated.parent))
+    print(validate_generated_report(generated, project_root))
 

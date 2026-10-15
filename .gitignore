@@ -248,3 +248,11 @@ data/processed/*
 
 # Local candidate model artifacts; metadata and aggregate metrics remain tracked.
 models/*.joblib
+
+# Private, local-only assessment deliverables. These are assembled from the
+# validated artifacts but must not be published in the repository.
+/02_cleaned_dataset.csv
+/03_model_artifact.joblib
+/submission/
+/Customer_Churn_Prediction_Final_Submission.zip
+/.jupyter_runtime/

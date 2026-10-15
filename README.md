@@ -41,7 +41,8 @@ customer-churn-prediction/
 |   |-- 05_model_development.ipynb    # Phase 5 training-only model comparison
 |   |-- 06_model_evaluation.ipynb     # Locked policy and final evaluation
 |   |-- 07_model_explainability.ipynb # Global, local, and error explanations
-|   `-- 08_retention_simulation.ipynb # Capacity and business-impact simulation
+|   |-- 08_retention_simulation.ipynb # Capacity and business-impact simulation
+|   `-- 09_final_data_science_notebook.ipynb # Integrated Phase 10 notebook
 |-- src/
 |   |-- __init__.py
 |   |-- preprocessing.py             # Reusable cleaning, split, and preprocessing code
@@ -50,7 +51,8 @@ customer-churn-prediction/
 |   |-- evaluation.py                # Calibration, thresholds, metrics, and robustness
 |   |-- explainability.py            # Model-preserving global/local explanation utilities
 |   |-- retention_simulation.py      # Capacity, baseline, and economics utilities
-|   `-- reporting.py                 # Deterministic final-report generation and validation
+|   |-- reporting.py                 # Deterministic final-report generation and validation
+|   `-- final_integration.py         # Final notebook/package assembly and validation
 |-- models/                          # Local saved model artifacts (ignored by Git)
 |-- reports/
 |   |-- figures/                     # Presentation-ready PNG charts
@@ -78,7 +80,6 @@ customer-churn-prediction/
 |   |-- test_explainability.py
 |   |-- test_retention_simulation.py
 |   `-- test_reporting.py
-|-- 04_business_report.pdf           # Canonical seven-page business report
 |-- requirements.txt
 |-- .gitignore
 `-- README.md
@@ -266,7 +267,7 @@ No API, application, database, or live campaign is produced in this phase.
 
 ## Final business report
 
-Phase 9 consolidates the verified Phase 1-8 evidence into the canonical seven-page A4 report at `04_business_report.pdf`. It is written for business stakeholders while preserving technical traceability: the report distinguishes measured results, fitted-model interpretations, hypothetical financial scenarios, and proposed actions. It covers the business problem, dataset and preparation, EDA, feature engineering, model comparison, locked held-out evaluation, calibration, global and customer-level explainability, top-20% retention simulation, recommendations, roadmap, limitations, and conclusion.
+Phase 9 consolidates the verified Phase 1-8 evidence into a seven-page A4 report generated at `reports/04_business_report.pdf`. It is written for business stakeholders while preserving technical traceability: the report distinguishes measured results, fitted-model interpretations, hypothetical financial scenarios, and proposed actions. It covers the business problem, dataset and preparation, EDA, feature engineering, model comparison, locked held-out evaluation, calibration, global and customer-level explainability, top-20% retention simulation, recommendations, roadmap, limitations, and conclusion.
 
 The report is generated deterministically from `reports/business_report_content.md` and the validated analytical outputs. `reports/report_source_mapping.md` maps every report section to its source evidence, while `reports/business_report_preview/` contains seven high-resolution rendered pages and `contact_sheet.png` for visual inspection. Report-specific EDA and model-comparison charts are regenerated directly from the locked training split and model-comparison output. Regenerate and validate the PDF from the repository root with:
 
@@ -294,6 +295,7 @@ Run the notebooks in order:
 6. `notebooks/06_model_evaluation.ipynb`
 7. `notebooks/07_model_explainability.ipynb`
 8. `notebooks/08_retention_simulation.ipynb`
+9. `notebooks/09_final_data_science_notebook.ipynb`
 
 All notebooks resolve project paths safely when launched from the repository root or the `notebooks` directory.
 
@@ -308,6 +310,7 @@ jupyter nbconvert --to notebook --execute notebooks/05_model_development.ipynb -
 jupyter nbconvert --to notebook --execute notebooks/06_model_evaluation.ipynb --output 06_model_evaluation.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 jupyter nbconvert --to notebook --execute notebooks/07_model_explainability.ipynb --output 07_model_explainability.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 jupyter nbconvert --to notebook --execute notebooks/08_retention_simulation.ipynb --output 08_retention_simulation.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
+jupyter nbconvert --to notebook --execute notebooks/09_final_data_science_notebook.ipynb --output 09_final_data_science_notebook.ipynb --output-dir notebooks --ExecutePreprocessor.timeout=1200
 ```
 
 ## Run the tests
@@ -352,8 +355,18 @@ The tests cover deterministic cleaning and feature engineering, raw-file preserv
 
 The executed Phase 6-9 environment used Python 3.13.3, pandas 3.0.6, NumPy 2.5.4, Matplotlib 3.11.2, seaborn 0.13.2, scikit-learn 1.9.1, joblib 1.6.0, ReportLab 4.4.10, PyMuPDF 1.28.2, and Pillow 12.3.0. Install the repository's declared dependency ranges from `requirements.txt`; exact results can vary across compatible library versions.
 
+## Final integration and private submission
+
+Phase 10 adds `notebooks/09_final_data_science_notebook.ipynb`, requirement traceability,
+and a documented QA record. The canonical cleaned dataset remains under `data/processed/`,
+the locked model remains under `models/`, and the generated report belongs under `reports/`.
+The repository root is intentionally limited to standard project configuration and
+documentation files. The Git-ignored `submission/` directory is retained as the organized
+private assessment backup and must not be published.
+
 ## Project status
 
-**Phase 9.1 complete:** the verified Phase 1-8 evidence is consolidated into a corrected, submission-ready `04_business_report.pdf`. The seven-page report uses larger report-specific charts, readable tables and captions, balanced page layouts, professional headers and footers, explicit low-accuracy interpretation, calibrated-probability context, and a prominent distinction between locked-threshold classification and capacity-safe top-20% ranking. All pages were programmatically validated and visually inspected; the source mapping, privacy checks, required metrics, data and model integrity checks, and byte-level reproducibility checks pass.
-
-**Next phase:** Final Project Integration and Submission, after approval. No submission ZIP or Phase 10 packaging has been created.
+**Phase 10 complete — submission ready:** the integrated notebook, cleaned dataset,
+locked model, corrected business report, final guide, private package, and ZIP have passed
+the requirement, privacy, integrity, execution, report, and automated-test checks recorded
+in `reports/final_requirements_checklist.md` and `reports/final_quality_assurance.md`.
